@@ -2,14 +2,29 @@ import analysis.BullishDetector
 from multiprocessing import Pool
 import numpy as np
 import time
+from datetime import datetime as dt
+import datetime
 import retriever.StockDataRetriever as retriever
 import analysis.LevelDetector as levels
+
+sell_under_percentage = 0.9
+sell_over_percentage = 1.05
+date_format = '%Y-%m-%d'
 
 
 def closest(lst, k):
     lst = np.asarray(lst)
     idx = (np.abs(lst - k)).argmin()
     return lst[idx]
+
+
+def convert_to_datetime(date):
+    return dt.strptime(date, date_format)
+
+
+def add_day(date):
+    additional_day = datetime.timedelta(days=1)
+    return (convert_to_datetime(date) + additional_day).date()
 
 
 def analyze_stock(symbol, start_date, end_date):
@@ -49,7 +64,7 @@ def get_stock_symbols(file_name):
     return str(file.read()).splitlines()
 
 
-def run_multiprocessing(stock_symbols, start_date, end_date):
+def buy_stocks(stock_symbols, start_date, end_date):
     start = time.time()
 
     values = []
@@ -69,17 +84,49 @@ def run_multiprocessing(stock_symbols, start_date, end_date):
     return buy_stocks
 
 
+def to_sell_stock(stock_symbol, buy_price, current_price, data):
+    sell_under = buy_price * sell_under_percentage
+    sell_over = buy_price * sell_over_percentage
+    if current_price < sell_under or current_price > sell_over:
+        return True
+    else:
+        return False
+
+
+def sell_stock(stock_symbols, buy_price, start_date, last_sell_date):
+    sellable = False
+
+
+    # for daysAgo in range(1, len(data.getData())):
+    #     close_today = data.getClose(daysAgo)
+    #     if close_today < sell_low or close_today > sell_high:
+    #         profit = round(close_today - buyPrice, 2)
+    #         # print(f"{symbol} profit = {profit}")
+    #         return profit
+
+    return None
+
+
 if __name__ == '__main__':
     stock_symbols = get_stock_symbols("test_stocks.txt")
-    start_date = "2020-01-01"
-    end_date = "2021-08-03"
-    buy_date = "2021-08-03"
-    today = "2021-08-31"
-    buy_stocks = run_multiprocessing(stock_symbols, start_date, end_date)
 
-    for symbol in buy_stocks:
-        try:
-            data = retriever.StockDataRetriever(symbol, buy_date, today)
-            print(symbol + ": " + str(round(data.getHigh(0), 2)))
-        except:
-            continue
+    start_date = "2019-06-01"
+    end_date = "2021-05-06"
+    buy_date = "2021-05-06"
+    today = "2021-9-13"
+    # buy_stocks = buy_stocks(stock_symbols, start_date, end_date)
+    total_profit = 0
+
+
+
+    # for symbol in buy_stocks:
+    #     try:
+    #         # data = retriever.StockDataRetriever(symbol, buy_date, today)
+    #         # buyPrice = round(data.getHigh(0), 2)
+    #         # print(f"{symbol} bought at {buyPrice}")
+    #
+    #
+    #
+    #     except:
+    #         continue
+    print(f"Total Profit {total_profit}")

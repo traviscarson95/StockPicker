@@ -4,9 +4,9 @@
 import retriever.StockDataRetriever as retriever
 import pandas as pd
 import numpy as np
-import matplotlib as mpl_dates
+import matplotlib.dates as mpl_dates
 import matplotlib as plt
-from mplfinance import candlestick_ohlc
+from mplfinance.original_flavor import candlestick_ohlc
 
 
 class LevelDetector:
